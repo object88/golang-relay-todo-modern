@@ -1,0 +1,42 @@
+{
+  "name": "golang-relay-todo-modern",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "babel-node ./server.js",
+    "build": "relay-compiler --src ./js/ --schema ./data/schema.graphql",
+    "update-schema": "babel-node ./scripts/updateSchema.js",
+    "lint": "eslint ./js"
+  },
+  "main": "server.js",
+  "repository": "https://github.com/object88/golang-relay-todo-modern.git",
+  "author": "object88 <object88@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "babel-core": "^6.24.1",
+    "babel-loader": "^7.0.0",
+    "babel-plugin-relay": "^1.0.1",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-runtime": "^6.23.0",
+    "express": "^4.15.3",
+    "react": "^15.5.4",
+    "react-dom": "^15.5.4",
+    "react-relay": "^1.0.0",
+    "todomvc-app-css": "^2.1.0",
+    "todomvc-common": "^1.0.3",
+    "webpack": "^2.6.1",
+    "webpack-dev-server": "^2.4.5",
+    "whatwg-fetch": "^2.0.3"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-eslint": "^7.2.3",
+    "eslint": "^3.19.0",
+    "eslint-config-fbjs": "^1.1.1",
+    "eslint-plugin-babel": "^4.1.1",
+    "eslint-plugin-flowtype": "^2.34.0",
+    "eslint-plugin-react": "^7.0.1"
+  }
+}
