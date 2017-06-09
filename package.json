@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "scripts": {
     "start": "babel-node ./server.js",
-    "build": "relay-compiler --src ./js/ --schema ./data/schema.graphql",
-    "update-schema": "babel-node ./scripts/updateSchema.js",
-    "lint": "eslint ./js"
+    "build": "go build -o ./bin/server && relay-compiler --src ./js/ --schema ./data/schema.graphql",
+    "lint": "eslint ./js",
+    "update-schema": "cd commands && go run ./updateSchema.go && cd .."
   },
   "main": "server.js",
   "repository": "https://github.com/object88/golang-relay-todo-modern.git",
