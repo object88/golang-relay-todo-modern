@@ -73,6 +73,11 @@ func GetUser(id string) User {
 	return usersByID[id]
 }
 
+// GetViewer returns the user
+func GetViewer() User {
+	return usersByID[me]
+}
+
 // MarkAllTodos sets the `complete` value of all Todos to the provided value
 func MarkAllTodos(complete bool) []*Todo {
 	allTodos := GetTodos(nil)
