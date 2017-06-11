@@ -67,10 +67,68 @@ func init() {
 		Name:        "User",
 		Description: "Me",
 		Fields: graphql.Fields{
+			"completedCount": &graphql.Field{
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					completed := true
+					allTodos := GetTodos(&completed)
+					return len(allTodos), nil
+				},
+				Type: graphql.Int,
+			},
 			"id": relay.GlobalIDField("user", nil),
+			"todos": &graphql.Field{
+				Args:        relay.ConnectionArgs,
+				Description: "The todos for this user",
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					args := relay.NewConnectionArguments(p.Args)
+					dataSlice := TodosToInterfaceSlice(GetTodos(nil)...)
+					return relay.ConnectionFromArray(dataSlice, args), nil
+				},
+				Type: todoConnection.ConnectionType,
+			},
+			"totalCount": &graphql.Field{
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					allTodos := GetTodos(nil)
+					return len(allTodos), nil
+				},
+				Type: graphql.Int,
+			},
 		},
 		Interfaces: []*graphql.Interface{
 			nodeDefinitions.NodeInterface,
+		},
+	})
+
+	addTodoMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
+		Name: "AddTodoMutation",
+		InputFields: graphql.InputObjectConfigFieldMap{
+			"text": &graphql.InputObjectFieldConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		OutputFields: graphql.Fields{
+			"todoEdge": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if payload, ok := p.Source.(map[string]interface{}); ok {
+						return GetTodo(payload["id"].(string)), nil
+					}
+					return nil, nil
+				},
+				Type: todoConnection.EdgeType,
+			},
+			"viewer": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return GetViewer(), nil
+				},
+				Type: userType,
+			},
+		},
+	})
+
+	mutationType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "Mutation",
+		Fields: graphql.Fields{
+			"addTodo": addTodoMutation,
 		},
 	})
 
@@ -90,10 +148,21 @@ func init() {
 
 	var err error
 	Schema, err = graphql.NewSchema(graphql.SchemaConfig{
-		Query: queryType,
-		Types: []graphql.Type{queryType, userType},
+		Mutation: mutationType,
+		Query:    queryType,
+		Types:    []graphql.Type{queryType, userType},
 	})
 	if err != nil {
 		panic(err)
 	}
+}
+
+// TodosToInterfaceSlice gets an interface slice.
+// See https://github.com/golang/go/wiki/InterfaceSlice
+func TodosToInterfaceSlice(todos ...*Todo) []interface{} {
+	var interfaceSlice = make([]interface{}, len(todos))
+	for i, d := range todos {
+		interfaceSlice[i] = d
+	}
+	return interfaceSlice
 }
