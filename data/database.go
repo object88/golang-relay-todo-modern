@@ -45,8 +45,8 @@ func ChangeTodoComplete(id string, complete bool) {
 }
 
 // GetTodo returns the Todo struct matching the given ID
-func GetTodo(id string) Todo {
-	return *todosByID[id]
+func GetTodo(id string) *Todo {
+	return todosByID[id]
 }
 
 // GetTodos returns all the todos for "me".  If the optional `complete`

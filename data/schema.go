@@ -115,6 +115,10 @@ func init() {
 				Type: graphql.NewNonNull(graphql.String),
 			},
 		},
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+			newID := AddTodo(inputMap["text"].(string), false)
+			return map[string]interface{}{"localTodoID": newID}, nil
+		},
 		OutputFields: graphql.Fields{
 			"todoEdge": {
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
@@ -137,10 +141,6 @@ func init() {
 				Type: userType,
 			},
 		},
-		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
-			newID := AddTodo(inputMap["text"].(string), false)
-			return map[string]interface{}{"localTodoID": newID}, nil
-		},
 	})
 
 	changeTodoStatusMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
@@ -152,6 +152,11 @@ func init() {
 			"id": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.String),
 			},
+		},
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+			resolvedID := relay.FromGlobalID(inputMap["id"].(string))
+			ChangeTodoComplete(resolvedID.ID, inputMap["complete"].(bool))
+			return map[string]interface{}{"id": resolvedID.ID}, nil
 		},
 		OutputFields: graphql.Fields{
 			"todo": {
@@ -170,15 +175,42 @@ func init() {
 				Type: userType,
 			},
 		},
-		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
-			resolvedID := relay.FromGlobalID(inputMap["id"].(string))
-			ChangeTodoComplete(resolvedID.ID, inputMap["complete"].(bool))
-			return map[string]interface{}{"id": resolvedID.ID}, nil
-		},
 	})
 
 	markAllTodosMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
 		Name: "MarkAllTodos",
+		InputFields: graphql.InputObjectConfigFieldMap{
+			"complete": &graphql.InputObjectFieldConfig{
+				Type: graphql.NewNonNull(graphql.Boolean),
+			},
+		},
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+			complete := inputMap["complete"].(bool)
+			changedIDs := MarkAllTodos(complete)
+			return map[string]interface{}{"changedIDs": changedIDs}, nil
+		},
+		OutputFields: graphql.Fields{
+			"changedTodos": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if payload, ok := p.Source.(map[string]interface{}); ok {
+						changedIDs := payload["changedIDs"].([]string)
+						changedTodos := make([]*Todo, len(changedIDs))
+						for k, v := range changedIDs {
+							changedTodos[k] = GetTodo(v)
+						}
+						return changedTodos, nil
+					}
+					return nil, nil
+				},
+				Type: graphql.NewList(todoType),
+			},
+			"viewer": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return GetViewer(), nil
+				},
+				Type: userType,
+			},
+		},
 	})
 
 	mutationType := graphql.NewObject(graphql.ObjectConfig{
