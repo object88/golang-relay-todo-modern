@@ -213,12 +213,39 @@ func init() {
 		},
 	})
 
+	removeCompletedTodosMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
+		Name: "RemoveCompletedTodos",
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+			completedIDs := RemoveCompletedTodos()
+			return map[string]interface{}{"completedIDs": completedIDs}, nil
+		},
+		OutputFields: graphql.Fields{
+			"deletedTodoIds": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if payload, ok := p.Source.(map[string]interface{}); ok {
+						completedIDs := payload["completedIDs"].([]string)
+						return completedIDs, nil
+					}
+					return nil, nil
+				},
+				Type: graphql.NewList(graphql.String),
+			},
+			"viewer": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return GetViewer(), nil
+				},
+				Type: userType,
+			},
+		},
+	})
+
 	mutationType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Mutation",
 		Fields: graphql.Fields{
-			"addTodo":          addTodoMutation,
-			"changeTodoStatus": changeTodoStatusMutation,
-			"markAllTodos":     markAllTodosMutation,
+			"addTodo":              addTodoMutation,
+			"changeTodoStatus":     changeTodoStatusMutation,
+			"markAllTodos":         markAllTodosMutation,
+			"removeCompletedTodos": removeCompletedTodosMutation,
 		},
 	})
 
