@@ -43,11 +43,11 @@ func init() {
 		Name:        "Todo",
 		Description: "A todo task",
 		Fields: graphql.Fields{
-			"id": relay.GlobalIDField("Todo", nil),
 			"complete": &graphql.Field{
 				Description: "Indicates the completeness of the todo",
 				Type:        graphql.Boolean,
 			},
+			"id": relay.GlobalIDField("Todo", nil),
 			"text": &graphql.Field{
 				Description: "The text of todo",
 				Type:        graphql.String,
@@ -63,6 +63,15 @@ func init() {
 		NodeType: todoType,
 	})
 
+	userToTodosCollectionArgs := graphql.FieldConfigArgument{
+		"status": &graphql.ArgumentConfig{
+			Type: graphql.String,
+		},
+	}
+	for k, v := range relay.ConnectionArgs {
+		userToTodosCollectionArgs[k] = v
+	}
+
 	userType = graphql.NewObject(graphql.ObjectConfig{
 		Name:        "User",
 		Description: "Me",
@@ -77,7 +86,7 @@ func init() {
 			},
 			"id": relay.GlobalIDField("user", nil),
 			"todos": &graphql.Field{
-				Args:        relay.ConnectionArgs,
+				Args:        userToTodosCollectionArgs,
 				Description: "The todos for this user",
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					args := relay.NewConnectionArguments(p.Args)
