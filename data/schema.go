@@ -109,7 +109,7 @@ func init() {
 	})
 
 	addTodoMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
-		Name: "AddTodoMutation",
+		Name: "AddTodo",
 		InputFields: graphql.InputObjectConfigFieldMap{
 			"text": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.String),
@@ -144,7 +144,7 @@ func init() {
 	})
 
 	changeTodoStatusMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
-		Name: "ChangeTodoStatusMutation",
+		Name: "ChangeTodoStatus",
 		InputFields: graphql.InputObjectConfigFieldMap{
 			"complete": &graphql.InputObjectFieldConfig{
 				Type: graphql.NewNonNull(graphql.Boolean),
