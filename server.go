@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/graphql-go/handler"
-	"github.com/object88/bbservice/data"
+	"github.com/object88/golang-relay-todo-modern/data"
 )
 
 func main() {
