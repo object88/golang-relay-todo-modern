@@ -1,7 +1,7 @@
 package data
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/graphql-go/graphql"
 	"github.com/object88/relay"
@@ -118,11 +118,8 @@ func init() {
 			},
 		},
 		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
-			text, ok := inputMap["text"].(string)
-			if !ok {
-				fmt.Printf("Failed to get text for AddTodo")
-			}
-			fmt.Printf("MutateAndGetPayload :: text: '%s'", text)
+			log.Printf("MutateAndGetPayload :: ")
+			text, _ := inputMap["text"].(string)
 			newID := AddTodo(text, false)
 			return map[string]interface{}{"localTodoID": newID}, nil
 		},
