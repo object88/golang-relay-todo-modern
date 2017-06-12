@@ -8,7 +8,7 @@ import (
 
 	"github.com/graphql-go/graphql"
 	"github.com/graphql-go/graphql/testutil"
-	"github.com/object88/bbservice/data"
+	"github.com/object88/golang-relay-todo-modern/data"
 )
 
 func main() {
