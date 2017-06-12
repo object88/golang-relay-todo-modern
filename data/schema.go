@@ -239,6 +239,68 @@ func init() {
 		},
 	})
 
+	removeTodoMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
+		Name: "RemoveTodo",
+		InputFields: graphql.InputObjectConfigFieldMap{
+			"id": &graphql.InputObjectFieldConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+			resolvedID := relay.FromGlobalID(inputMap["id"].(string))
+			RemoveTodo(resolvedID.ID)
+			return map[string]interface{}{"id": resolvedID.ID}, nil
+		},
+		OutputFields: graphql.Fields{
+			"deletedTodoId": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if payload, ok := p.Source.(map[string]interface{}); ok {
+						removedID := payload["id"].(string)
+						return removedID, nil
+					}
+					return nil, nil
+				},
+				Type: graphql.String,
+			},
+			"viewer": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return GetViewer(), nil
+				},
+				Type: userType,
+			},
+		},
+	})
+
+	renameTodoMutation := relay.MutationWithClientMutationID(relay.MutationConfig{
+		Name: "RenameTodo",
+		InputFields: graphql.InputObjectConfigFieldMap{
+			"id": &graphql.InputObjectFieldConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+			"text": &graphql.InputObjectFieldConfig{
+				Type: graphql.NewNonNull(graphql.String),
+			},
+		},
+		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
+			resolvedID := relay.FromGlobalID(inputMap["id"].(string))
+			text := inputMap["text"].(string)
+			RenameTodo(resolvedID.ID, text)
+			return map[string]interface{}{"localTodoID": resolvedID.ID}, nil
+		},
+		OutputFields: graphql.Fields{
+			"todo": {
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if payload, ok := p.Source.(map[string]interface{}); ok {
+						removedID := payload["localTodoID"].(string)
+						return removedID, nil
+					}
+					return nil, nil
+				},
+				Type: todoType,
+			},
+		},
+	})
+
 	mutationType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "Mutation",
 		Fields: graphql.Fields{
@@ -246,6 +308,8 @@ func init() {
 			"changeTodoStatus":     changeTodoStatusMutation,
 			"markAllTodos":         markAllTodosMutation,
 			"removeCompletedTodos": removeCompletedTodosMutation,
+			"removeTodo":           removeTodoMutation,
+			"renameTodo":           renameTodoMutation,
 		},
 	})
 
