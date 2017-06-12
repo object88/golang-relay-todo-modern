@@ -6,21 +6,40 @@ const (
 
 // Todo is a task for a user to complete
 type Todo struct {
-	complete bool
-	id       string
-	text     string
+	Complete bool   `json:"complete"`
+	ID       string `json:"id"`
+	Text     string `json:"text"`
 }
 
 // User represents a system user
 type User struct {
+	ID string `json:"id"`
 }
 
-var nextTodoID = 0
-var todosByID = map[string]*Todo{}
-var todosByUserID = map[string][]*Todo{
-	me: []*Todo{},
+var nextTodoID = 2
+var todosByID = map[string]*Todo{
+	"0": &Todo{
+		Complete: true,
+		ID:       "0",
+		Text:     "Taste JavaScript",
+	},
+	"1": &Todo{
+		Complete: false,
+		ID:       "1",
+		Text:     "Buy a unicorn",
+	},
 }
-var usersByID = map[string]User{}
+var todoIDsByUser = map[string][]string{
+	me: []string{
+		"0",
+		"1",
+	},
+}
+var usersByID = map[string]*User{
+	me: &User{
+		ID: me,
+	},
+}
 
 // AddTodo creates a new Todo struct based on the given values, adds it to
 // the collections, and returns its ID
@@ -33,15 +52,15 @@ func AddTodo(text string, complete bool) string {
 		text,
 	}
 	todosByID[id] = todo
-	newList := append(todosByUserID[me], todo)
-	todosByUserID[me] = newList
+	newList := append(todoIDsByUser[me], id)
+	todoIDsByUser[me] = newList
 	return id
 }
 
 // ChangeTodoComplete sets the complete propery for the given Todo ID
 func ChangeTodoComplete(id string, complete bool) {
 	todo := GetTodo(id)
-	todo.complete = complete
+	todo.Complete = complete
 }
 
 // GetTodo returns the Todo struct matching the given ID
@@ -52,16 +71,21 @@ func GetTodo(id string) *Todo {
 // GetTodos returns all the todos for "me".  If the optional `complete`
 // parameter is provided, filter the results to match that value
 func GetTodos(complete *bool) []*Todo {
-	todos := todosByUserID[me]
+	todos := todoIDsByUser[me]
 	if complete == nil {
-		return todos
+		results := make([]*Todo, len(todos))
+		for k, v := range todos {
+			results[k] = todosByID[v]
+		}
+		return results
 	}
 
 	results := []*Todo{}
 
 	for _, v := range todos {
-		if v.complete == *complete {
-			results = append(results, v)
+		todo := todosByID[v]
+		if todo.Complete == *complete {
+			results = append(results, todo)
 		}
 	}
 
@@ -69,12 +93,12 @@ func GetTodos(complete *bool) []*Todo {
 }
 
 // GetUser returns the User struct matching the given ID
-func GetUser(id string) User {
+func GetUser(id string) *User {
 	return usersByID[id]
 }
 
 // GetViewer returns the user
-func GetViewer() User {
+func GetViewer() *User {
 	return usersByID[me]
 }
 
@@ -84,8 +108,8 @@ func MarkAllTodos(complete bool) []*Todo {
 	changedTodos := []*Todo{}
 
 	for _, v := range allTodos {
-		if v.complete != complete {
-			v.complete = complete
+		if v.Complete != complete {
+			v.Complete = complete
 			changedTodos = append(changedTodos, v)
 		}
 	}
@@ -95,18 +119,18 @@ func MarkAllTodos(complete bool) []*Todo {
 
 // RemoveTodo removes the todo with the given id
 func RemoveTodo(id string) {
-	todos := GetTodos(nil)
+	delete(todosByID, id)
 
 	index := -1
-	for k, v := range todos {
-		if v.id == id {
+	for k, v := range todoIDsByUser[me] {
+		if v == id {
 			index = k
 			break
 		}
 	}
 
-	remainderTodos := append(todos[:index], todos[index+1:]...)
-	todosByUserID[me] = remainderTodos
+	remainderTodos := append(todoIDsByUser[me][:index], todoIDsByUser[me][index+1:]...)
+	todoIDsByUser[me] = remainderTodos
 }
 
 // RemoveCompletedTodos removes the todos which are complete, and returns the
@@ -115,21 +139,22 @@ func RemoveCompletedTodos() []string {
 	todos := GetTodos(nil)
 
 	removedIDs := []string{}
-	remainderTodos := []*Todo{}
+	remainderTodos := []string{}
 	for _, v := range todos {
-		if v.complete {
-			removedIDs = append(removedIDs, v.id)
+		if v.Complete {
+			removedIDs = append(removedIDs, v.ID)
+			delete(todosByID, v.ID)
 		} else {
-			remainderTodos = append(remainderTodos, v)
+			remainderTodos = append(remainderTodos, v.ID)
 		}
 	}
 
-	todosByUserID[me] = remainderTodos
+	todoIDsByUser[me] = remainderTodos
 	return removedIDs
 }
 
 // RenameTodo changes the todo text
 func RenameTodo(id, text string) {
 	todo := todosByID[id]
-	todo.text = text
+	todo.Text = text
 }
