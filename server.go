@@ -19,7 +19,7 @@ func main() {
 	http.Handle("/graphql", h)
 
 	// serve!
-	port := ":8081"
+	port := ":8080"
 	log.Printf(`GraphQL server starting up on http://localhost%s`, port)
 	err := http.ListenAndServe(port, nil)
 	if err != nil {
