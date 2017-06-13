@@ -38,6 +38,8 @@ function getOptimisticResponse(complete, todos, user) {
   };
 }
 
+let tempID = 0;
+
 function commit(
   environment,
   complete,
@@ -49,7 +51,10 @@ function commit(
     {
       mutation,
       variables: {
-        input: {complete},
+        input: {
+          complete,
+          clientMutationId: tempID++,
+        },
       },
       optimisticResponse: () => getOptimisticResponse(complete, todos, user),
     }

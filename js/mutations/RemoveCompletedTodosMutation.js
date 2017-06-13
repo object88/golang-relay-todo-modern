@@ -27,6 +27,8 @@ function sharedUpdater(store, user, deletedIDs) {
   );
 }
 
+let tempID = 0;
+
 function commit(
   environment,
   todos,
@@ -37,7 +39,9 @@ function commit(
     {
       mutation,
       variables: {
-        input: {},
+        input: {
+          clientMutationId: tempID++,
+        },
       },
       updater: (store) => {
         const payload = store.getRootField('removeCompletedTodos');

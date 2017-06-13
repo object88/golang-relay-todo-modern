@@ -45,7 +45,10 @@ function commit(
     {
       mutation,
       variables: {
-        input: {text},
+        input: {
+          text,
+          clientMutationId: tempID++,
+        },
       },
       updater: (store) => {
         const payload = store.getRootField('addTodo');

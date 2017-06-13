@@ -25,6 +25,8 @@ function getOptimisticResponse(text, todo) {
   };
 }
 
+let tempID = 0;
+
 function commit(
   environment,
   text,
@@ -35,7 +37,11 @@ function commit(
     {
       mutation,
       variables: {
-        input: {text, id: todo.id},
+        input: {
+          text, id:
+          todo.id,
+          clientMutationId: tempID++,
+        },
       },
       optimisticResponse: () => getOptimisticResponse(text, todo),
     }
