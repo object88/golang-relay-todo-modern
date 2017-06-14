@@ -256,7 +256,7 @@ func init() {
 			"deletedTodoId": {
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if payload, ok := p.Source.(map[string]interface{}); ok {
-						removedID := payload["id"].(string)
+						removedID := relay.ToGlobalID(todoType.Name(), payload["id"].(string))
 						return removedID, nil
 					}
 					return nil, nil
