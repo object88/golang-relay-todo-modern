@@ -187,18 +187,14 @@ func init() {
 		},
 		MutateAndGetPayload: func(inputMap map[string]interface{}, info graphql.ResolveInfo, ctx context.Context) (map[string]interface{}, error) {
 			complete := inputMap["complete"].(bool)
-			changedIDs := MarkAllTodos(complete)
-			return map[string]interface{}{"changedIDs": changedIDs}, nil
+			changedTodos := MarkAllTodos(complete)
+			return map[string]interface{}{"changedTodos": changedTodos}, nil
 		},
 		OutputFields: graphql.Fields{
 			"changedTodos": {
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if payload, ok := p.Source.(map[string]interface{}); ok {
-						changedIDs := payload["changedIDs"].([]string)
-						changedTodos := make([]*Todo, len(changedIDs))
-						for k, v := range changedIDs {
-							changedTodos[k] = GetTodo(v)
-						}
+						changedTodos := payload["changedTodos"].([]*Todo)
 						return changedTodos, nil
 					}
 					return nil, nil
@@ -225,7 +221,11 @@ func init() {
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if payload, ok := p.Source.(map[string]interface{}); ok {
 						completedIDs := payload["completedIDs"].([]string)
-						return completedIDs, nil
+						resolvedCompletedIDs := make([]string, len(completedIDs))
+						for k, v := range completedIDs {
+							resolvedCompletedIDs[k] = relay.ToGlobalID(todoType.Name(), v)
+						}
+						return resolvedCompletedIDs, nil
 					}
 					return nil, nil
 				},
@@ -292,8 +292,8 @@ func init() {
 			"todo": {
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if payload, ok := p.Source.(map[string]interface{}); ok {
-						removedID := payload["localTodoID"].(string)
-						return removedID, nil
+						renamedID := payload["localTodoID"].(string)
+						return todosByID[renamedID], nil
 					}
 					return nil, nil
 				},

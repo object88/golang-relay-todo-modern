@@ -1,5 +1,9 @@
 package data
 
+import (
+	"strconv"
+)
+
 const (
 	me string = "Me"
 )
@@ -44,7 +48,7 @@ var usersByID = map[string]*User{
 // AddTodo creates a new Todo struct based on the given values, adds it to
 // the collections, and returns its ID
 func AddTodo(text string, complete bool) string {
-	id := string(nextTodoID)
+	id := strconv.FormatInt(int64(nextTodoID), 10)
 	nextTodoID++
 	todo := &Todo{
 		complete,
