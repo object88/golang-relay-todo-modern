@@ -23,8 +23,8 @@
     "classnames": "^2.2.5",
     "express": "^4.15.3",
     "prop-types": "^15.5.10",
-    "react": "^15.5.4",
-    "react-dom": "^15.5.4",
+    "react": "^15.6.0",
+    "react-dom": "^15.6.0",
     "react-relay": "^1.0.0",
     "todomvc-app-css": "^2.1.0",
     "todomvc-common": "^1.0.3",
@@ -39,7 +39,7 @@
     "eslint-config-fbjs": "^1.1.1",
     "eslint-plugin-babel": "^4.1.1",
     "eslint-plugin-flowtype": "^2.34.0",
-    "eslint-plugin-react": "^7.0.1",
+    "eslint-plugin-react": "^7.1.0",
     "relay-compiler": "^1.0.0"
   }
 }
