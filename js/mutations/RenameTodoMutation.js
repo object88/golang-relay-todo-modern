@@ -43,7 +43,7 @@ function commit(
           clientMutationId: tempID++,
         },
       },
-      optimisticResponse: () => getOptimisticResponse(text, todo),
+      optimisticResponse: getOptimisticResponse(text, todo),
     }
   );
 }

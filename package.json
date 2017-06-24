@@ -22,6 +22,7 @@
     "babel-runtime": "^6.23.0",
     "classnames": "^2.2.5",
     "express": "^4.15.3",
+    "extract-text-webpack-plugin": "^2.1.2",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",

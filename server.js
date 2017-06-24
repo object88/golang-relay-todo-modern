@@ -2,24 +2,13 @@ import express from 'express';
 import path from 'path';
 import webpack from 'webpack';
 import WebpackDevServer from 'webpack-dev-server';
+import webpack_config from './webpack.config';
 
 const APP_PORT = 3000;
 const GRAPHQL_PORT = 8080;
 
 // Serve the Relay app
-const compiler = webpack({
-  entry: ['whatwg-fetch', path.resolve(__dirname, 'js', 'app.js')],
-  module: {
-    loaders: [
-      {
-        exclude: /node_modules/,
-        loader: 'babel-loader',
-        test: /\.js$/,
-      },
-    ],
-  },
-  output: {filename: 'app.js', path: '/'},
-});
+const compiler = webpack(webpack_config);
 const app = new WebpackDevServer(compiler, {
   contentBase: '/public/',
   proxy: {'/graphql': `http://localhost:${GRAPHQL_PORT}`},

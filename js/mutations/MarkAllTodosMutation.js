@@ -56,7 +56,7 @@ function commit(
           clientMutationId: tempID++,
         },
       },
-      optimisticResponse: () => getOptimisticResponse(complete, todos, user),
+      optimisticResponse: getOptimisticResponse(complete, todos, user),
     }
   );
 }
