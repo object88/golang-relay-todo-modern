@@ -2,7 +2,7 @@
   "name": "golang-relay-todo-modern",
   "version": "0.0.1",
   "scripts": {
-    "start": "babel-node ./server.js",
+    "start": "./bin/server",
     "build": "go build -o ./bin/server && relay-compiler --src ./js/ --schema ./schema.json",
     "lint": "eslint ./js",
     "update-schema": "cd commands && go run ./updateSchema.go && cd .."
