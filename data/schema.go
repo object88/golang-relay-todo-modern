@@ -85,6 +85,12 @@ func init() {
 				Type: graphql.Int,
 			},
 			"id": relay.GlobalIDField("user", nil),
+			"opsCount": &graphql.Field{
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					return 42, nil
+				},
+				Type: graphql.Int,
+			},
 			"todos": &graphql.Field{
 				Args:        userToTodosCollectionArgs,
 				Description: "The todos for this user",
